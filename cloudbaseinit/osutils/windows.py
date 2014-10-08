@@ -357,12 +357,12 @@ class WindowsUtils(base.BaseOSUtils):
         return True
 
     def create_user(self, username, password, password_expires=False):
-        self._create_or_change_user(username, password, True,
-                                    password_expires)
+        self._create_or_change_user(username, password, create=True,
+                                    password_expires=password_expires)
 
     def set_user_password(self, username, password, password_expires=False):
-        self._create_or_change_user(username, password, False,
-                                    password_expires)
+        self._create_or_change_user(username, password, create=False,
+                                    password_expires=password_expires)
 
     def _get_user_sid_and_domain(self, username):
         sid = ctypes.create_string_buffer(1024)
@@ -483,7 +483,7 @@ class WindowsUtils(base.BaseOSUtils):
         args = [w32tm_path, '/config', '/manualpeerlist:%s' % ntp_host,
                 '/syncfromflags:manual', '/update']
 
-        (out, err, ret_val) = self.execute_process(args, False)
+        (out, err, ret_val) = self.execute_process(args, shell=False)
         if ret_val:
             raise exception.CloudbaseInitException(
                 'w32tm failed to configure NTP.\nOutput: %(out)s\nError:'
@@ -517,7 +517,7 @@ class WindowsUtils(base.BaseOSUtils):
             args = [netsh_path, "interface", "ipv4", "set", "subinterface",
                     str(iface_index), "mtu=%s" % mtu,
                     "store=persistent"]
-            (out, err, ret_val) = self.execute_process(args, False)
+            (out, err, ret_val) = self.execute_process(args, shell=False)
             if ret_val:
                 raise exception.CloudbaseInitException(
                     'Setting MTU for interface "%(mac_address)s" with '
@@ -962,4 +962,4 @@ class WindowsUtils(base.BaseOSUtils):
         args = [powershell_path, '-ExecutionPolicy', 'RemoteSigned',
                 '-NonInteractive', '-File', script_path]
 
-        return self.execute_process(args, False)
+        return self.execute_process(args, shell=False)
